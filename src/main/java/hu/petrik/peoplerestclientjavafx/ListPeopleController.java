@@ -4,8 +4,11 @@ import com.google.gson.Gson;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -56,13 +59,37 @@ public class ListPeopleController {
         Gson converter = new Gson();
         Person[] people = converter.fromJson(content, Person[].class);
         peopleTable.getItems().clear();
-        for (Person person: people) {
+        for (Person person : people) {
             peopleTable.getItems().add(person);
         }
     }
 
     @FXML
     public void insertClick(ActionEvent actionEvent) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("create-person-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 640, 480);
+            Stage stage = new Stage();
+            stage.setTitle("Create person");
+            stage.setScene(scene);
+            stage.setOnCloseRequest(event -> {
+                try {
+                    loadPeopleFromServer();
+                } catch (IOException e) {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Hiba");
+                    alert.setHeaderText("Nem sikerült kapcsolódni a szerverhez");
+                    alert.showAndWait();
+                }
+            });
+            stage.show();
+        } catch (IOException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Hiba");
+            alert.setHeaderText("Hiba történt az űrlap betöltése során");
+            alert.setContentText(e.getMessage());
+            alert.showAndWait();
+        }
     }
 
     @FXML
@@ -86,7 +113,7 @@ public class ListPeopleController {
                 + selected.getName());
         Optional<ButtonType> optionalButtonType = confirmation.showAndWait();
         if (optionalButtonType.isPresent() &&
-            optionalButtonType.get().equals(ButtonType.OK)
+                optionalButtonType.get().equals(ButtonType.OK)
         ) {
             String url = App.BASE_URL + "/" + selected.getId();
             try {
