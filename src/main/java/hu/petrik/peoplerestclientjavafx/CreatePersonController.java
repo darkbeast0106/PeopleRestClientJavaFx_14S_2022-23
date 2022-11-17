@@ -8,7 +8,7 @@ import javafx.scene.control.*;
 
 import java.io.IOException;
 
-public class CreatePersonController {
+public class CreatePersonController extends Controller {
     @FXML
     private TextField nameField;
     @FXML
@@ -31,17 +31,11 @@ public class CreatePersonController {
         String email = emailField.getText().trim();
         int age = ageField.getValue();
         if (name.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Figyelmeztetés");
-            alert.setHeaderText("Név megadása kötelező");
-            alert.showAndWait();
+            warning("Név megadása kötelező");
             return;
         }
         if (email.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Figyelmeztetés");
-            alert.setHeaderText("Email megadása kötelező");
-            alert.showAndWait();
+            warning("Email megadása kötelező");
             return;
         }
         Person newPerson = new Person(0, name, email, age);
@@ -54,17 +48,10 @@ public class CreatePersonController {
                 emailField.setText("");
                 ageField.getValueFactory().setValue(30);
             } else {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Hiba");
-                alert.setHeaderText("Hiba történt a felvétel során");
-                alert.setContentText(response.getContent());
-                alert.showAndWait();
+                error("Hiba történt a felvétel során", response.getContent());
             }
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Hiba");
-            alert.setHeaderText("Nem sikerült kapcsolódni a szerverhez");
-            alert.showAndWait();
+            error("Nem sikerült kapcsolódni a szerverhez");
         }
     }
 }

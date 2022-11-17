@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Optional;
 
-public class ListPeopleController {
+public class ListPeopleController extends Controller {
 
     @FXML
     private Button insertButton;
@@ -43,11 +43,7 @@ public class ListPeopleController {
             try {
                 loadPeopleFromServer();
             } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Hiba");
-                alert.setHeaderText("Hiba történt az adatok lekérése során");
-                alert.setContentText(e.getMessage());
-                alert.showAndWait();
+                error("Hiba történt az adatok lekérése során", e.getMessage());
                 Platform.exit();
             }
         });
@@ -76,19 +72,12 @@ public class ListPeopleController {
                 try {
                     loadPeopleFromServer();
                 } catch (IOException e) {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Hiba");
-                    alert.setHeaderText("Nem sikerült kapcsolódni a szerverhez");
-                    alert.showAndWait();
+                    error("Nem sikerült kapcsolódni a szerverhez");
                 }
             });
             stage.show();
         } catch (IOException e) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Hiba");
-            alert.setHeaderText("Hiba történt az űrlap betöltése során");
-            alert.setContentText(e.getMessage());
-            alert.showAndWait();
+            error("Hiba történt az űrlap betöltése során", e.getMessage());
         }
     }
 
@@ -100,18 +89,15 @@ public class ListPeopleController {
     public void deleteClick(ActionEvent actionEvent) {
         Person selected = peopleTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Figyelmeztetés");
-            alert.setHeaderText("Törléshez előbb válasszon ki egy elemet!");
-            alert.showAndWait();
+            warning("Törléshez előbb válasszon ki egy elemet!");
             return;
         }
 
-        Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-        confirmation.setTitle("Biztos?");
-        confirmation.setHeaderText("Biztos, hogy törölni szeretné az alábbi rekordot: "
-                + selected.getName());
-        Optional<ButtonType> optionalButtonType = confirmation.showAndWait();
+        Optional<ButtonType> optionalButtonType =
+                alert(Alert.AlertType.CONFIRMATION, "Biztos?",
+                        "Biztos, hogy törölni szeretné az alábbi rekordot: "
+                                + selected.getName(),
+                        "");
         if (optionalButtonType.isPresent() &&
                 optionalButtonType.get().equals(ButtonType.OK)
         ) {
@@ -120,10 +106,7 @@ public class ListPeopleController {
                 RequestHandler.delete(url);
                 loadPeopleFromServer();
             } catch (IOException e) {
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Hiba");
-                alert.setHeaderText("Nem sikerült kapcsolódni a szerverhez");
-                alert.showAndWait();
+                error("Nem sikerült kapcsolódni a szerverhez");
             }
         }
     }
