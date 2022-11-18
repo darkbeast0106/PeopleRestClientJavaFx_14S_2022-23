@@ -83,6 +83,30 @@ public class ListPeopleController extends Controller {
 
     @FXML
     public void updateClick(ActionEvent actionEvent) {
+        Person selected = peopleTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            warning("Módosításhoz előbb válasszon ki egy elemet!");
+            return;
+        }
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("update-person-view.fxml"));
+            Scene scene = new Scene(fxmlLoader.load(), 640, 480);
+            UpdatePersonController controller = fxmlLoader.getController();
+            controller.setPerson(selected);
+            Stage stage = new Stage();
+            stage.setTitle("Update "+ selected.getName());
+            stage.setScene(scene);
+            stage.setOnHidden(event -> {
+                try {
+                    loadPeopleFromServer();
+                } catch (IOException e) {
+                    error("Nem sikerült kapcsolódni a szerverhez");
+                }
+            });
+            stage.show();
+        } catch (IOException e) {
+            error("Hiba történt az űrlap betöltése során", e.getMessage());
+        }
     }
 
     @FXML
